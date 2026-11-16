@@ -4,6 +4,8 @@
 
 - 網站：https://moon-rag.fcucda.workers.dev/（Cloudflare Workers，推上 `main` 後自動部署）
 - 操作影片：[docs/demo.webm](docs/demo.webm)（44 秒，星圖、縮放平移旋轉、主題查詢、未應用篩選、簡報、問答）
+- [Uploading demo.webm…]()
+
 - 規則：[AGENTS.md](AGENTS.md)（給 AI 讀的完整專案規則）
 
 ## 為什麼做這個
