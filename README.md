@@ -2,7 +2,8 @@
 
 把**論文筆記、實驗紀錄與想法**放進同一個向量空間。選一個研究，所有相關的筆記會依相關度用彩色連線串起來，並由高到低排序；首頁會自動列出「已經成立、卻還沒被應用」的實驗成果。
 
-- 網站：https://wenyi22.github.io/moon-rag/
+- 網站：https://moon-rag.fcucda.workers.dev/（Cloudflare Workers，推上 `main` 後自動部署）
+- 操作影片：[docs/demo.webm](docs/demo.webm)（44 秒，星圖、縮放平移旋轉、主題查詢、未應用篩選、簡報、問答）
 - 規則：[AGENTS.md](AGENTS.md)（給 AI 讀的完整專案規則）
 
 ## 為什麼做這個
@@ -22,7 +23,7 @@ vibe coding 時會同時開很多實驗分支，人腦記不住哪些實驗彼�
 ## 架構
 
 ```
-content/*.md  →  pipeline/build_atlas.py  →  web/public/data/atlas.json  →  React（Vite）  →  GitHub Pages
+content/*.md  →  pipeline/build_atlas.py  →  web/public/data/atlas.json  →  React（Vite）  →  Cloudflare Workers
   （筆記）       （驗證、切塊、嵌入、3D MDS 投影）                              （星圖、總表、簡報、問答）
 ```
 

@@ -41,7 +41,8 @@ content/<類型>/<id>.md          ← 唯一的資料來源（人或 AI 撰寫�
 web/public/data/atlas.json      ← 產物，必須 commit，禁止手動編輯
         │  npm run build（先檢查 content_hash，過期就失敗）
         ▼
-web/dist/  →  GitHub Actions  →  GitHub Pages
+web/dist/  →  Cloudflare Workers（推上 main 自動建置部署：https://moon-rag.fcucda.workers.dev/）
+                               （.github/workflows/deploy.yml 是 GitHub Pages 的備用部署）
 ```
 
 - 相關度一律用**原始向量的餘弦相似度**；3D 座標只負責擺放。

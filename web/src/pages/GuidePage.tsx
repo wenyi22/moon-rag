@@ -7,7 +7,7 @@ const STEPS = [
   { t: "AI 依模板寫筆記", d: "從 templates/ 複製對應類型的模板，填好 frontmatter，內文用 ## 分段，存到 content/<類型>/<id>.md。" },
   { t: "重建向量星圖", d: "執行 python pipeline/build_atlas.py：驗證格式、切塊、嵌入、MDS 投影成 3D 座標，輸出 atlas.json。" },
   { t: "建置檢查", d: "npm run build 先比對 content_hash，內容改了卻沒重建就會失敗，網站不會顯示過期資料。" },
-  { t: "推上 GitHub", d: "GitHub Actions 自動建置並部署到 Pages。新筆記會出現在星圖、總表、簡報與問答裡。" },
+  { t: "推上 GitHub", d: "Cloudflare 自動建置並部署網站。新筆記會出現在星圖、總表、簡報與問答裡。" },
 ];
 
 const FIELDS: [string, string][] = [
