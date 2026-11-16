@@ -3,7 +3,8 @@
 把**論文筆記、實驗紀錄與想法**放進同一個向量空間。選一個研究，所有相關的筆記會依相關度用彩色連線串起來，並由高到低排序；首頁會自動列出「已經成立、卻還沒被應用」的實驗成果。
 
 - 網站：https://moon-rag.fcucda.workers.dev/（Cloudflare Workers，推上 `main` 後自動部署）
-- 操作影片： [demo.webm](https://github.com/user-attachments/assets/f652a9d8-3382-4c9d-b11c-f7d0fdeb6c1e)
+- 操作影片：
+-  [demo.webm](https://github.com/user-attachments/assets/f652a9d8-3382-4c9d-b11c-f7d0fdeb6c1e)
 
 - 規則：[AGENTS.md](AGENTS.md)（給 AI 讀的完整專案規則）
 
