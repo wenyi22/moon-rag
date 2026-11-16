@@ -5,7 +5,7 @@ build_atlas.py — 把 content/ 的 Markdown 筆記編譯成網站用的 web/pub
   1. 讀取 content/{papers,experiments,ideas}/*.md，解析並驗證 frontmatter
   2. Sentence-Window 切塊（與 ChatbotV2 相同的視窗 / 重疊設定）
   3. sentence-transformers 產生每個 chunk 的向量，平均後成為筆記向量
-  4. MDS 以餘弦距離把筆記向量投影成 2D 座標，供星圖顯示（為何不用 t-SNE 見 content/experiments/exp-map-projection.md）
+  4. MDS 以餘弦距離把筆記向量投影成 3D 座標，供 2.5D 星圖顯示（為何不用 t-SNE 見 exp-map-projection，為何用 3D 見 exp-map-2-5d）
   5. 輸出 atlas.json（筆記內容 + 向量 + 座標 + content_hash）
 
 content_hash 讓 CI 檢查「內容改了卻沒重建 atlas」的情況（見 web/scripts/check-atlas.mjs）。
@@ -144,19 +144,25 @@ def embed_and_project(notes: list[dict]) -> None:
         n["chunks"] = len(chunks)
     mat = np.vstack(vecs)
 
-    # MDS：讓 2D 距離盡量貼近餘弦距離，地圖上的遠近就代表語意遠近
+    # MDS 投影成 3D：讓 3D 距離盡量貼近餘弦距離（比 2D 多保留的資訊見 content/experiments/exp-map-2-5d.md）
     dist = np.clip(1 - mat @ mat.T, 0, None)
     np.fill_diagonal(dist, 0)
     try:
-        mds = MDS(n_components=2, dissimilarity="precomputed", random_state=42, n_init=4)
+        mds = MDS(n_components=3, dissimilarity="precomputed", random_state=42, n_init=4)
     except TypeError:  # 新版 scikit-learn 把參數改名為 metric
-        mds = MDS(n_components=2, metric="precomputed", random_state=42, n_init=4)
-    xy = mds.fit_transform(dist)
-    xy = (xy - xy.min(axis=0)) / (np.ptp(xy, axis=0) + 1e-9)  # 正規化到 0..1
+        mds = MDS(n_components=3, metric="precomputed", random_state=42, n_init=4)
+    xyz = mds.fit_transform(dist)
 
-    for n, v, p in zip(notes, mat, xy):
+    # MDS 的座標軸方向是任意的：用 SVD 轉到主軸，x 是變異最大的方向，z（高度）是最小的方向
+    xyz = xyz - xyz.mean(axis=0)
+    _, _, vt = np.linalg.svd(xyz, full_matrices=False)
+    xyz = xyz @ vt.T
+    # 三軸用同一個比例縮放到 0..1（置中於 0.5），保留真實的長寬高比例；前端依畫面自動縮放
+    xyz = xyz / (2 * np.abs(xyz).max() + 1e-9) + 0.5
+
+    for n, v, p in zip(notes, mat, xyz):
         n["embedding"] = [round(float(x), 4) for x in v]
-        n["x"], n["y"] = round(float(p[0]), 4), round(float(p[1]), 4)
+        n["x"], n["y"], n["z"] = (round(float(c), 4) for c in p)
 
 
 def main() -> int:

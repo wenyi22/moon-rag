@@ -6,7 +6,7 @@ date: 2026-11-16
 status: validated
 summary: 30 篇筆記用 t-SNE 時出現離群點，其他點全擠在角落；MDS 直接保留餘弦距離，點與點的最小間距中位數從 0.095 提升到 0.102，而且距離可以解讀。
 tags: [visualization, dimensionality-reduction, moon-rag]
-links: [tsne-2008]
+links: [tsne-2008, exp-map-2-5d]
 applied_in: [moon-rag/pipeline/build_atlas.py]
 source: 1440px 截圖比較，以及最近鄰距離的統計
 ---
@@ -30,3 +30,5 @@ source: 1440px 截圖比較，以及最近鄰距離的統計
 ## 結論
 
 資料量少時，t-SNE 的局部最佳化不穩定，而且距離本身沒有意義。MDS 讓 2D 距離盡量貼近餘弦距離，筆記數量在百篇以內時更適合。筆記超過數百篇後可以再評估 UMAP。
+
+後續改成 3D 投影的 2.5D 星圖，見實驗「星圖改成 2.5D」。

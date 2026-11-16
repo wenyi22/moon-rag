@@ -116,7 +116,22 @@ textarea { resize: vertical; caret-color: var(--accent); }
 /* ---------- 星圖頁 ---------- */
 .atlas-page { display: grid; grid-template-columns: minmax(0, 1fr) 420px; height: calc(100dvh - var(--top)); }
 .map-pane { position: relative; display: flex; flex-direction: column; min-width: 0; border-right: 1px solid var(--line); }
-.atlas-map { flex: 1; width: 100%; height: 100%; min-height: 0; display: block; }
+.atlas-stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.atlas-map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.atlas-map.dragging { cursor: grabbing; }
+.ground line { stroke: var(--grid); stroke-width: 1; }
+.stem line { stroke: var(--line-strong); stroke-width: 1; opacity: 0.6; }
+.stem circle { fill: var(--line-strong); }
+.map-controls { position: absolute; top: 12px; right: 12px; display: flex; gap: 8px; align-items: center; }
+.ctrl-group, .seg { display: flex; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 2px; }
+.ctrl-group .icon-btn { width: 32px; height: 32px; }
+.seg button { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--ink-2); font: inherit; font-size: 13px; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.seg button:hover { color: var(--ink); }
+.seg button.on { background: var(--surface-2); color: var(--ink); }
+.seg button:focus-visible, .ctrl-group .icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.map-hint { position: absolute; left: 16px; bottom: 10px; margin: 0; font-size: 12px; color: var(--ink-3); pointer-events: none; }
+.hint-coarse { display: none; }
+@media (pointer: coarse) { .hint-fine { display: none; } .hint-coarse { display: inline; } }
 .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 12px 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-2); }
 .legend-item { display: inline-flex; align-items: center; gap: 7px; }
 .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -136,7 +151,7 @@ textarea { resize: vertical; caret-color: var(--accent); }
 .center-ring { fill: none; stroke: var(--ink); stroke-width: 1.5; }
 .forgotten-ring { fill: none; stroke: var(--warn); stroke-width: 1.5; stroke-dasharray: 3 3; transform-box: fill-box; transform-origin: center; animation: spin 14s linear infinite; }
 .edge-manual { stroke: var(--ink-2); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.55; }
-.edge-rel { stroke-linecap: round; stroke-dasharray: var(--len); stroke-dashoffset: var(--len); animation: draw 0.7s var(--ease) var(--delay) forwards; transition: stroke-width 0.15s, stroke-opacity 0.15s; }
+.edge-rel { stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 0.7s var(--ease) var(--delay) forwards; transition: stroke-width 0.15s, stroke-opacity 0.15s; }
 .query-mark { fill: var(--accent); stroke: var(--bg); stroke-width: 2; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 @keyframes spin { to { transform: rotate(360deg); } }

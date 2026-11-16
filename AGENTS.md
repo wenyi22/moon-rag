@@ -36,7 +36,7 @@ content/<類型>/<id>.md          ← 唯一的資料來源（人或 AI 撰寫�
         │    1. 驗證 frontmatter（格式錯誤直接失敗）
         │    2. Sentence-Window 切塊（視窗 3、重疊 1，沿用 ChatbotV2）
         │    3. paraphrase-multilingual-MiniLM-L12-v2 嵌入 → 平均成筆記向量
-        │    4. MDS（餘弦距離）投影成 2D 座標
+        │    4. MDS（餘弦距離）投影成 3D 座標（x、y 是地面，z 是高度）
         ▼
 web/public/data/atlas.json      ← 產物，必須 commit，禁止手動編輯
         │  npm run build（先檢查 content_hash，過期就失敗）
@@ -44,7 +44,7 @@ web/public/data/atlas.json      ← 產物，必須 commit，禁止手動編輯
 web/dist/  →  GitHub Actions  →  GitHub Pages
 ```
 
-- 相關度一律用**原始向量的餘弦相似度**；2D 座標只負責擺放。
+- 相關度一律用**原始向量的餘弦相似度**；3D 座標只負責擺放。
 - 瀏覽器端沒有嵌入模型。文字查詢用「字元 bigram TF-IDF 找起點 + 向量擴展」，分數 = 0.5 × 字面 + 0.5 × 語意。
 
 ---
@@ -72,7 +72,7 @@ moon-rag/
 │   └── src/
 │       ├── main.tsx          路由（新增頁面在這裡註冊）
 │       ├── styles.css        全站唯一樣式檔與設計 token
-│       ├── lib/              atlas 型別、排序、markdown、類型與狀態設定
+│       ├── lib/              atlas 型別、排序、相機投影（camera.ts）、markdown、類型與狀態設定
 │       ├── components/       AtlasMap、RankedList、Tags、Layout
 │       └── pages/            每個路由一個檔案
 └── .github/workflows/deploy.yml
@@ -186,6 +186,7 @@ moon-rag/
 - 字體：IBM Plex Sans + Noto Sans TC；數字與 id 用 IBM Plex Mono（`.num`）。
 - 圖示只用 `lucide-react`，不用 emoji 代替圖示。
 - 動態：只有星圖連線依名次逐條畫出這一個主要動畫；必須尊重 `prefers-reduced-motion`。
+- 星圖是 **2.5D**：滾輪、觸控板或雙指以指標為中心縮放，拖曳平移，右鍵或 Shift 拖曳旋轉與傾斜；「俯視」等同 2D。投影數學只放在 `lib/camera.ts`，`AtlasMap.tsx` 只負責繪製與輸入。
 - 響應式：1440、768、390 三種寬度都要能用，390 不可出現橫向捲軸。
 
 ---
@@ -209,7 +210,22 @@ moon-rag/
 
 ---
 
-## 10. 指令
+## 10. 擴展門檻
+
+筆記數量增加時，依下表處理。**新增筆記後（第 4 節第 9 步）若總數超過下一個門檻，要在回報中提醒使用者。**
+
+| 筆記數 | 會遇到的問題 | 處理方式 | 狀態 |
+|---|---|---|---|
+| 約 100 | 點和標籤擠在一起 | 2.5D、縮放平移、依空間顯示標籤 | 已完成 |
+| 約 500 | SVG 重繪變慢；標籤碰撞計算是 O(n²) | 標籤只算畫面內的點（已做）；改用網格索引加速碰撞檢查 | 待做 |
+| 約 1000 | atlas.json 約 4 MB（目前每篇約 4 KB） | 拆成地圖用的輕量檔與內文檔，內文在打開筆記時才載入 | 待做 |
+| 數千 | MDS 是 O(n²) 記憶體；SVG 撐不住 | 投影改 UMAP；`AtlasMap` 改用 Canvas 或 WebGL，`lib/camera.ts` 沿用 | 待做 |
+
+重新評估投影時，執行 `python pipeline/experiments/map_dims_check.py` 並更新實驗「星圖改成 2.5D」。
+
+---
+
+## 11. 指令
 
 ```bash
 # Python 環境（一次）
@@ -228,7 +244,7 @@ npm run build      # 同步檢查 + 型別檢查 + 建置
 
 ---
 
-## 11. 提交前檢查清單
+## 12. 提交前檢查清單
 
 - [ ] `python pipeline/build_atlas.py` 成功，`atlas.json` 已更新
 - [ ] `cd web && npm run build` 成功
@@ -238,7 +254,7 @@ npm run build      # 同步檢查 + 型別檢查 + 建置
 
 ---
 
-## 12. 禁止事項
+## 13. 禁止事項
 
 - **不要把任何 API key 寫進 repo。** 問答頁的 key 由使用者在瀏覽器輸入，只存在 localStorage。
 - 不要手動編輯 `web/public/data/atlas.json`，它只能由 pipeline 產生。

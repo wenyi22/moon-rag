@@ -20,8 +20,10 @@ export interface Note {
   path: string;
   chunks: number;
   embedding: number[];
+  /** 3D MDS 座標（0..1，三軸同比例）；x、y 是地面，z 是高度。只負責擺放，相關度一律看 embedding */
   x: number;
   y: number;
+  z: number;
 }
 
 export interface Atlas {
